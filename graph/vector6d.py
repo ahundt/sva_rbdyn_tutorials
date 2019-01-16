@@ -1,9 +1,10 @@
 from tvtk.api import tvtk
+from tvtk.common import configure_input_data
 
 import eigen as e
 import sva
 
-from transform import setActorTransform
+from . import transform
 
 class Vector6dViz(object):
   def __init__(self, linear, angular, frame, linColor, angColor):
@@ -27,27 +28,46 @@ class Vector6dViz(object):
                                point2=(angNorm/2., -angNormW, angNormW),
                                center=(angNorm/2., 0., 0.), negative=True,
                                resolution=20)
-    arcPdm = tvtk.PolyDataMapper(input=arcSource.output)
-    self.arcActor = tvtk.Actor(mapper=arcPdm)
-    self.arcActor.property.color = angColor
+
+    # arcPdm = tvtk.PolyDataMapper(input=arcSource.output)
+    arcPdm = tvtk.PolyDataMapper()
+
+    # https://stackoverflow.com/questions/35089379/how-to-fix-traiterror-the-input-trait-of-a-instance-is-read-only
+    # configure_input_data(textPdm, textSource)# https://github.com/enthought/mayavi/issues/521
+    arcPdm.input_connection = arcPdm.output_port
+
+    prop = tvtk.Property(color=angColor)
+    # https://github.com/enthought/mayavi/issues/521
+    # arcPdm.input_connection = arcSource.output_port
+    self.arcActor = tvtk.Actor(mapper=arcPdm, property=prop)
+
+    # commented due to api change, new lines are above Actor creation
+    # self.arcActor.property.color = angColor
+    # https://github.com/enthought/mayavi/blob/5c2694b72b329b8d5c469bc459a211378e2c8581/tvtk/pyface/actors.py#L112
     self.arcActor.user_transform = tvtk.Transform()
     # apply the angular transform
-    setActorTransform(self.arcActor, X_a)
+    transform.setActorTransform(self.arcActor, X_a)
 
 
   def _createVector(self, vector, frame, color):
     source = tvtk.ArrowSource()
-    pdm = tvtk.PolyDataMapper(input=source.output)
-    actor = tvtk.Actor(mapper=pdm)
+    # pdm = tvtk.PolyDataMapper(input=source.output)
+    pdm = tvtk.PolyDataMapper()
+    # https://github.com/enthought/mayavi/issues/521
+    pdm.input_connection = source.output_port
+    # configure_input_data(pdm, source)
+    prop = tvtk.Property(color=color)
+    actor = tvtk.Actor(mapper=pdm, property=prop)
     actor.user_transform = tvtk.Transform()
-    actor.property.color = color
+    # commented due to api change, new lines are above Actor creation
+    # actor.property.color = color
     norm = vector.norm()
     actor.scale = (norm,)*3
     quat = e.Quaterniond()
     # arrow are define on X axis
     quat.setFromTwoVectors(vector, e.Vector3d.UnitX())
     X = sva.PTransformd(quat)*frame
-    setActorTransform(actor, X)
+    transform.setActorTransform(actor, X)
     return actor, X
 
 

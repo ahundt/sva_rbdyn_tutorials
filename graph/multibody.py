@@ -2,7 +2,7 @@ import rbdyn as rbd
 
 from body import linesBody, meshBody, endEffectorBody
 from joint import revoluteJoint, prismaticJoint, sphericalJoint
-from transform import setActorTransform
+from . import transform
 
 JOINT_FROM_TYPE = {
   rbd.Joint.Rev: revoluteJoint,
@@ -65,12 +65,12 @@ class MultiBodyViz(object):
     if displayBodies:
       for bi, actor, X_s in self.aBodies:
         X_a = X_s*bodyPosW[bi]
-        setActorTransform(actor, X_a)
+        transform.setActorTransform(actor, X_a)
 
     if displayJoints:
       for ji, actor, X_s in self.aJoints:
         X_a = X_s*bodyPosW[ji]
-        setActorTransform(actor, X_a)
+        transform.setActorTransform(actor, X_a)
 
 
   def addActors(self, scene):

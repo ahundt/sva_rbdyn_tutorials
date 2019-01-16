@@ -1,9 +1,10 @@
 from tvtk.api import tvtk
+from tvtk.common import configure_input_data
 
 import eigen as e
 import sva
 
-from transform import setActorTransform
+from . import transform
 
 class Axis(object):
   def __init__(self, X=sva.PTransformd.Identity(), length=0.1, text=''):
@@ -16,7 +17,15 @@ class Axis(object):
     self.axesActor.user_transform = tvtk.Transform()
 
     textSource = tvtk.TextSource(text=text, backing=False)
-    textPdm = tvtk.PolyDataMapper(input=textSource.output)
+    # textPdm = tvtk.PolyDataMapper(input=textSource.output)
+    textPdm = tvtk.PolyDataMapper()
+
+    # https://stackoverflow.com/questions/35089379/how-to-fix-traiterror-the-input-trait-of-a-instance-is-read-only
+    # configure_input_data(textPdm, textSource.output_port)
+
+    # https://github.com/enthought/mayavi/issues/521
+    textPdm.input_connection = textSource.output_port
+
     #self.textActor = tvtk.Actor(mapper=textPdm)
     self.textActor = tvtk.Follower(mapper=textPdm)
     # take the maximum component of the bound and use it to scale it
@@ -35,7 +44,7 @@ class Axis(object):
 
 
   def _transform(self):
-    setActorTransform(self.axesActor, self._X)
+    transform.setActorTransform(self.axesActor, self._X)
     # user_transform is not take into account by Follower
     self.textActor.position = tuple((self.X_text*self._X).translation())
 
