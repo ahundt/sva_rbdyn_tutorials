@@ -8,18 +8,26 @@ This repository contains IPython notebook tutorial for the SpaceVecAlg and the R
  * [My First Inverse Kinematic](http://nbviewer.ipython.org/github/jorisv/sva_rbdyn_tutorials/blob/master/MyFirstIK.ipynb)
  * [Inverse Kinematic with the REEM-C humanoid robot](http://nbviewer.ipython.org/github/jorisv/sva_rbdyn_tutorials/blob/master/ReemCIK.ipynb)
 
-## Ubuntu Install/Run Instructions
+## Ubuntu 16.04 Install/Run Instructions
 
 ```
 # install the software
 sudo add-apt-repository ppa:pierre-gergondet+ppa/multi-contact-unstable
 sudo apt-get update
 sudo apt-get install python-tasks python3-tasks
+
 python2 -c 'import sva; import tasks'
 python3 -c 'import sva; import tasks'
 
 # install the python packages
 pip3 install jupyter vtk mayavi PyQt5 --user --upgrade
+
+# wxPython install from https://wiki.wxpython.org/How%20to%20install%20wxPython
+pip3 install --user --upgrade -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-16.04 wxPython
+
+# enable mayavi visualization in jupyter lab
+jupyter nbextension install --py mayavi --user
+jupyter nbextension enable --py mayavi --user
 
 # get the code
 mkdir -p ~/src/jrl-umi3218
