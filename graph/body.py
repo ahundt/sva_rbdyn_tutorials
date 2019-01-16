@@ -33,7 +33,8 @@ def linesBody(mb, bodyName, successorJointsName):
   map(lambda s: apd.add_input(s.output), sources)
   apd.update()
 
-  pdm = tvtk.PolyDataMapper(input=apd.output)
+  pdm = tvtk.PolyDataMapper()
+  pdm.input_connection = apd.output_port
   actor = tvtk.Actor(mapper=pdm)
   actor.property.color = (0., 0., 0.)
   actor.user_transform = tvtk.Transform()
@@ -87,11 +88,24 @@ def endEffectorBody(X_s, size, color):
                         point2=tuple(p2),
                         center=tuple(X_s.translation()))
 
-  apd.add_input(ls.output)
-  apd.add_input(ps.output)
+  # apd.add_input(ls.output)
+  # apd.add_input(ps.output)
+  # https://github.com/enthought/mayavi/blob/ac5c8e316335078c25461a0bce4a724ae86f1836/tvtk/tests/test_tvtk.py#L586
+  apd.add_input_data(ls.output)
+  apd.add_input_data(ps.output)
 
-  pdm = tvtk.PolyDataMapper(input=apd.output)
-  actor = tvtk.Actor(mapper=pdm)
+  # pdm = tvtk.PolyDataMapper(input=apd.output)
+  # arcPdm = tvtk.PolyDataMapper(input=arcSource.output)
+  pdm = tvtk.PolyDataMapper()
+
+  # https://stackoverflow.com/questions/35089379/how-to-fix-traiterror-the-input-trait-of-a-instance-is-read-only
+  # configure_input_data(textPdm, textSource)# https://github.com/enthought/mayavi/issues/521
+  pdm.input_connection = apd.output_port
+
+  prop = tvtk.Property(color=color)
+  # https://github.com/enthought/mayavi/issues/521
+  # arcPdm.input_connection = arcSource.output_port
+  actor = tvtk.Actor(mapper=pdm, property=prop)
   actor.property.color = color
   actor.user_transform = tvtk.Transform()
 

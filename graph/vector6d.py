@@ -34,7 +34,7 @@ class Vector6dViz(object):
 
     # https://stackoverflow.com/questions/35089379/how-to-fix-traiterror-the-input-trait-of-a-instance-is-read-only
     # configure_input_data(textPdm, textSource)# https://github.com/enthought/mayavi/issues/521
-    arcPdm.input_connection = arcPdm.output_port
+    arcPdm.input_connection = arcSource.output_port
 
     prop = tvtk.Property(color=angColor)
     # https://github.com/enthought/mayavi/issues/521

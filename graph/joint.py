@@ -8,7 +8,8 @@ def makeActor(source, color):
   """
   Create an actor from a source and a color.
   """
-  pdm = tvtk.PolyDataMapper(input=source.output)
+  pdm = tvtk.PolyDataMapper()
+  pdm.input_connection = source.output_port
   actor = tvtk.Actor(mapper=pdm)
   actor.property.color = color
   actor.user_transform = tvtk.Transform()

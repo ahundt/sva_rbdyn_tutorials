@@ -1,13 +1,13 @@
 import rbdyn as rbd
 
-from body import linesBody, meshBody, endEffectorBody
-from joint import revoluteJoint, prismaticJoint, sphericalJoint
+from . import body
+from . import joint
 from . import transform
 
 JOINT_FROM_TYPE = {
-  rbd.Joint.Rev: revoluteJoint,
-  rbd.Joint.Prism: prismaticJoint,
-  rbd.Joint.Spherical: sphericalJoint
+  rbd.Joint.Rev: joint.revoluteJoint,
+  rbd.Joint.Prism: joint.prismaticJoint,
+  rbd.Joint.Spherical: joint.sphericalJoint
 }
 
 
@@ -35,17 +35,17 @@ class MultiBodyViz(object):
         del lineBodiesByIndex[bi] # don't create a line body if a mesh is set
       except KeyError:
         pass
-      a, X_s = meshBody(fileName, scale)
+      a, X_s = body.meshBody(fileName, scale)
       self.aBodies.append((bi, a, X_sm))
 
     # create actor from end effector
     for bodyName, (X_see, size, color) in endEffectorDict.items():
       bi = mb.bodyIndexByName(bodyName)
-      a, X_s = endEffectorBody(X_see, size, color)
+      a, X_s = body.endEffectorBody(X_see, size, color)
       self.aBodies.append((bi, a, X_s))
 
     for bi, b in lineBodiesByIndex.items():
-      a, X_s = linesBody(mb, b.name(), successorJointsName)
+      a, X_s = body.linesBody(mb, b.name(), successorJointsName)
       self.aBodies.append((bi, a, X_s))
 
     for ji, j in enumerate(mb.joints()):
